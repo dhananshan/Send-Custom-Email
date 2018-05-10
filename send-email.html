@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Send Email</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="content/richtext.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="node_modules\vss-web-extension-sdk\lib\VSS.SDK.js"></script>
+    <script src="content/jquery.richtext.min.js"></script>
+    <script src="content/main.js"></script>
+<style>
+        .custom-padding{
+            padding-left: 2%;
+            padding-right: 2%;
+            padding-top: 1%;
+        }
+
+        .toggle-button{
+            width:100px;
+        }
+    </style>
+</head>
+<body style="overflow-y: auto;">
+<script type="text/javascript">
+ 	// Sets up the initial handshake with the host frame
+     VSS.init({
+		// Our extension will explicitly notify the host when we're done loading
+		explicitNotifyLoaded: true,
+
+		// We are using some VSTS APIs, so we will need the module loader to load them in
+		usePlatformScripts: true,
+		usePlatformStyles: true       
+	});
+
+    VSS.notifyLoadSucceeded();
+    
+    sendemailextension.loadSettings();
+</script>
+
+    <div class="custom-padding">
+    <h4>Send release email</h4>
+    <br>
+
+    <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#email">Email</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#setting">Setting</a>
+            </li>
+    </ul>
+
+
+
+    <div id="myTabContent" class="tab-content">
+
+        <div class="tab-pane fade" id="email">
+        <br/>
+                    <div class="row">
+                            <div class="col-sm-4 btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-primary toggle-button">
+                                    <input type="radio" name="apptype" id="web" value="web"> Web
+                                    </label>
+                                    <label class="btn btn-primary toggle-button">
+                                    <input type="radio" name="apptype" id="mobile" value="mobile"> Mobile
+                                    </label>
+                            </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                    <div class="col-sm-4 btn-group btn-group-toggle" data-toggle="buttons">
+                            <label class="btn btn-primary toggle-button">
+                            <input type="radio" name="release" id="uat" value="uat"> Uat
+                            </label>
+                            <label class="btn btn-primary toggle-button">
+                            <input type="radio" name="release" id="prod" value="prod"> Prod
+                            </label>
+                    </div>
+                    </div>
+                    <br>
+
+                    <div class="row">            
+                        <div class="col-sm-4">    
+                            <label for="subject">Subject</label>
+                            <input type="text" class="form-control" id="subject" placeholder="email subject">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row"> 
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-2"><button type="button" class="btn btn-secondary pull-right" onclick="sendemailextension.previewEmail()">Preview</button></div> 
+                    </div>
+
+
+
+
+
+
+                    <br>
+
+
+                    <h3>Preview email</h3>
+                    <br>
+            
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <div id="previewemailContainer">  
+                                <textarea rows="4" class="container"  id="previewemail"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-7"></div>
+                        <div class="col-sm-1">
+                            <button id="btnsendemail" type="button" class="btn btn-primary"   onclick="sendemailextension.sendEmail()">Send Email</button>
+                        </div>
+                    </div>
+                    <br>
+                    <br>  
+
+        </div>
+
+
+
+
+
+        <div class="tab-pane fade" id="setting">
+                <br/>
+                <div class="row">            
+                        <div class="col-sm-5">    
+                            <label for="to">To:</label>
+                            <input aria-describedby="toHelp" type="text" class="form-control" id="to">
+                            <small id="toHelp" class="form-text text-muted">Seperate by <b>;</b> for multiple email address</small>
+                        </div>
+                </div>
+                <br>
+                <div class="row">            
+                            <div class="col-sm-2">    
+                                    <label for="backendurl">Backend Email URL:</label>
+                                    <input type="text" class="form-control" id="backendurl">
+                            </div>
+                            <div class="col-sm-2">    
+                                <label for="webuatqid">Uat Query Id (web):</label>
+                                <input type="text" class="form-control" id="webuatqid">
+                            </div>   
+                            <div class="col-sm-2">    
+                                    <label for="webprodqid">Prod Query Id (web):</label>
+                                    <input type="text" class="form-control" id="webprodqid">
+                            </div>   
+                            <div class="col-sm-2">    
+                                    <label for="mobileuatqid">Uat Query Id (mobile):</label>
+                                    <input type="text" class="form-control" id="mobileuatqid">
+                            </div>   
+                            <div class="col-sm-2">    
+                                    <label for="mobileprodqid">Prod Query Id (mobile):</label>
+                                    <input type="text" class="form-control" id="mobileprodqid">
+                            </div>          
+                </div>
+                <br>
+                <div class="row">   
+                        <div class="col-sm-10">    
+                                <label for="body">Body Template:</label>
+                                <br>
+                                <div id="bodyContainer">  
+                                    <textarea aria-describedby="bodyHelp" rows="4" class="container" id="body"></textarea>
+                                    <small id="bodyHelp" class="form-text text-muted">Add {workitem} in your email body to replace with workitems of the query.</small>
+                                </div>
+                            </div>
+                </div>
+                <br>
+                <div class="row">            
+                        <div class="col-sm-9">    
+                        </div>
+                        <div class="col-sm-1">    
+                                <button type="button" class="btn btn-primary pull-right" onclick="sendemailextension.saveSettings()">Save</button>
+                        </div>       
+                </div>
+                <br>
+                <br>
+        </div>
+
+
+    </div>
+
+    </div>
+
+<script>
+    $('#previewemail').richText();
+    $('#body').richText();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+ {
+        "manifestVersion": 1,
+        "id": "send-custom-email",
+        "version": "1.0.0",
+        "name": "Send Custom Email",
+        "description": "Send your own custom release email",
+        "publisher": "NavinDhananshan",
+        "targets": [
+            {
+                "id": "Microsoft.VisualStudio.Services"
+                }
+            ],
+        "icons": {
+            "default": "images/icon.png"
+         },
+        "contributions": [
+            {
+                "id": "navin.sendcustomemail",
+                "type": "ms.vss-web.hub",
+                "description": "Adds an 'Email' hub to the build/ release hub group.",
+                "targets": [
+                    "ms.vss-build-web.build-release-hub-group"
+                    ],
+                "properties": {
+                    "name": "Email",
+                    "order": 99,
+                    "uri": "send-email.html"
+                }
+            }
+        ],
+        "scopes": [
+            "vso.work"
+        ],
+        "files": [
+            {
+                "path": "send-email.html", "addressable": true
+            },
+            {
+                "path": "content", "addressable": true
+            },
+            {
+                "path": "node_modules", "addressable": true
+            },
+            {
+                "path": "images/icon.png", "addressable": true
+            }
+        ]
+    }
