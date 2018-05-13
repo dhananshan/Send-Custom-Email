@@ -11,7 +11,7 @@ VSTS extension to send customized release email which adds completed workitems b
 # Demo 
 - Once you installed it will appear in **Build and Release**
 
-![Alt Title](Demo-1.png?raw=true "Title")
+![Alt Title](demo-1.png?raw=true "Title")
 
 
-![Alt Title](Demo-2.png?raw=true "Demo 1")
+![Alt Title](demo-2.png?raw=true "Demo 1")
