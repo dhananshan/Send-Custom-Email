@@ -7,7 +7,7 @@ VSTS extension to send customized release email which adds completed workitems b
 
 ## Prerequisites
 - Backend API which accepts below JSON as post to send email (I used Azure Functions).
-> "To":"\<EMAIL ADDRESSES\>","Subject":"<SUBJECT>","Body":"<EMAIL BODY>"}
+> "To":"\<EMAIL ADDRESSES\>","Subject":"\<SUBJECT\>","Body":"\<EMAIL BODY\>"}
 # Demo 
 - Once you installed it will appear in **Build and Release**
 - Select UAT or Prod and Web or Mobile so it will trigger the query you have set in settings page (next image) and adds it in email once   you click preview 
