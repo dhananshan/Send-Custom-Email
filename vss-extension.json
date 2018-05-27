@@ -1,7 +1,7 @@
  {
         "manifestVersion": 1,
         "id": "send-custom-email",
-        "version": "1.0.0",
+        "version": "1.5.0",
         "name": "Send Custom Email",
         "description": "Send your own custom release email",
         "publisher": "NavinDhananshan",
@@ -30,6 +30,33 @@
         ],
         "scopes": [
             "vso.work"
+        ],
+        "categories": [
+            "Build and release"
+        ],
+        "branding": {
+            "color": "rgb(53, 152, 217)",
+            "theme": "light"
+        },
+        "content": {
+            "details": {
+                "path": "README.md"
+            }
+        },
+        "links": {
+            "getstarted": {
+                "uri": "https://github.com/dhananshan/Send-Custom-Email"
+            },
+            "support": {
+                "uri": "https://github.com/dhananshan/Send-Custom-Email/issues"
+            }
+        },
+        "repository": {
+            "type": "git",
+            "uri": "https://github.com/dhananshan/Send-Custom-Email"
+        },
+        "galleryFlags": [
+            "Public"
         ],
         "files": [
             {

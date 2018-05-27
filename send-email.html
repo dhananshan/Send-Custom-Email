@@ -129,7 +129,26 @@
 
         <div class="tab-pane fade" id="setting">
                 <br/>
-                <div class="row">            
+                <div class="row">
+                        <div class="col-sm-5">    
+                                <label for="releaseType">Select Release:</label>
+                                <select class="form-control" id="releaseType" onchange="sendemailextension.onChangeReleaseType()">
+                                  <option value="" disabled selected>--- Select ---</option>
+                                  <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create new release</u></option>
+                                  <option  value="test">Test</option>
+                                </select>
+                        </div>
+                </div>
+
+                <div id="settingcontent" hidden>
+                <br/>
+                <div class="row">                    
+                        <div class="col-sm-5">    
+                                <label for="name">Name:</label>
+                                <input aria-describedby="nameHelp" type="text" class="form-control" id="name">
+                                <small id="nameHelp" class="form-text text-muted">Any unique name to identify this release (e.g. Mobile UAT, Web Production, Android UAT) </small>
+                        </div>
+
                         <div class="col-sm-5">    
                             <label for="to">To:</label>
                             <input aria-describedby="toHelp" type="text" class="form-control" id="to">
@@ -137,27 +156,18 @@
                         </div>
                 </div>
                 <br>
-                <div class="row">            
-                            <div class="col-sm-2">    
-                                    <label for="backendurl">Backend Email URL:</label>
-                                    <input type="text" class="form-control" id="backendurl">
-                            </div>
-                            <div class="col-sm-2">    
-                                <label for="webuatqid">Uat Query Id (web):</label>
-                                <input type="text" class="form-control" id="webuatqid">
-                            </div>   
-                            <div class="col-sm-2">    
-                                    <label for="webprodqid">Prod Query Id (web):</label>
-                                    <input type="text" class="form-control" id="webprodqid">
-                            </div>   
-                            <div class="col-sm-2">    
-                                    <label for="mobileuatqid">Uat Query Id (mobile):</label>
-                                    <input type="text" class="form-control" id="mobileuatqid">
-                            </div>   
-                            <div class="col-sm-2">    
-                                    <label for="mobileprodqid">Prod Query Id (mobile):</label>
-                                    <input type="text" class="form-control" id="mobileprodqid">
-                            </div>          
+                <div class="row">
+                    <div class="col-sm-5">    
+                                <label for="to">Backend Email URL:</label>
+                                <input aria-describedby="tobackemailhelp" type="text" class="form-control" id="backendurl">
+                                <small id="tobackemailhelp" class="form-text text-muted"><a href="https://github.com/dhananshan/Send-Custom-Email#prerequisites" target="_blank">Help?</a> </small>
+                    </div>
+
+                    <div class="col-sm-5">    
+                        <label for="qid">Query Id:</label>
+                        <input aria-describedby="qidhelp" type="text" class="form-control" id="qid">
+                        <small id="qidhelp" class="form-text text-muted"><a href="https://stackoverflow.com/a/46274191/5417721" target="_blank">Help?</a> </small>
+                    </div>
                 </div>
                 <br>
                 <div class="row">   
@@ -175,11 +185,13 @@
                         <div class="col-sm-9">    
                         </div>
                         <div class="col-sm-1">    
-                                <button type="button" class="btn btn-primary pull-right" onclick="sendemailextension.saveSettings()">Save</button>
+                                <button id="btnSave" style="width: 100%;" type="button" class="btn btn-primary pull-right" onclick="sendemailextension.saveSettings()">Save</button>
                         </div>       
                 </div>
                 <br>
                 <br>
+            </div>
+
         </div>
 
 

@@ -1,23 +1,71 @@
 var sendemailextension = (function () {
-    
+
+    // Used in releaseType dropdown as value for item 'create'. to avoid other dynamic values  
+    // TODO: Need to change
+    var createStaticId="create3b951d5a916e463d81e59f02f0ff09c3";
+
+    var settingArray=[];
+
+    clearSettings = function () {
+        $("#to").val('');
+        $("#backendurl").val('');                
+        $("#name").val('');
+        $("#qid").val('');
+        $("#body").val('');
+    }
+
+    onChangeReleaseType= function () {
+
+        clearSettings();
+
+        $("#settingcontent").show();
+
+        if($("#releaseType").val()==createStaticId){
+            $("#btnSave").text("Save");
+        }else{
+            $("#btnSave").text("Update");
+         
+            var existingObj = settingArray.find(x=>x.Name==$("#releaseType").val());
+            console.log("Existing Object", existingObj );
+            
+            $("#to").val(existingObj.To);
+            $("#backendurl").val(existingObj.BackendUrl);                
+            $("#name").val(existingObj.Name);
+            $("#qid").val(existingObj.Qid);
+            $("#body").val(existingObj.Body);
+            $("#bodyContainer .richText-editor").append(existingObj.Body);
+        }
+
+    }
+
+    populateDropdown = function (){
+            
+        var dropdown=$("#releaseType");
+
+        dropdown.empty();
+        dropdown.append('<option value="" disabled selected>--- Select ---</option>');
+        dropdown.append(' <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create new release</u></option>');
+
+            $.each(settingArray, function (index, item) {
+                dropdown.append(
+                    $('<option>', {
+                        value: item.Name,
+                        text: item.Name
+                    }, '</option>'))
+                  }
+                 );
+    }
 
     loadSettings = function () {
+
         // Get data service
         VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
             // Get value in user scope
                 dataService.getValue("setting").then(function(value) {
                     console.log("Setting retrieve value is: " + value);
                     
-                    var obj = JSON.parse(value);
-                    $("#to").val(obj.To);
-                    $("#backendurl").val(obj.BackendUrl);                
-                    $("#mobileuatqid").val(obj.MobileUatQId);
-                    $("#mobileprodqid").val(obj.MobileProdQId);
-                    $("#webuatqid").val(obj.WebUatQId);
-                    $("#webprodqid").val(obj.WebProdQId);
-        
-                    $("#body").val(obj.Body);
-                    $("#bodyContainer .richText-editor").append(obj.Body);
+                    settingArray = JSON.parse(value);
+                    populateDropdown();
 
                 });
             });
@@ -29,20 +77,29 @@ var sendemailextension = (function () {
         obj.To=$("#to").val();
         obj.BackendUrl=$("#backendurl").val();
         obj.Body=$("#body").val();
-        obj.MobileUatQId=$("#mobileuatqid").val();
-        obj.MobileProdQId=$("#mobileprodqid").val();
-        obj.WebUatQId=$("#webuatqid").val();
-        obj.WebProdQId=$("#webprodqid").val();
-      
-        var jsonString = JSON.stringify(obj);
-      
+        obj.Name=$("#name").val();
+        obj.Qid=$("#qid").val();
+        obj.Body=$("#body").val();
+ 
+        let existsIndex= settingArray.findIndex(x=>x.Name==obj.Name);
+
+        if(existsIndex<0){
+            settingArray.push(obj);
+        }else{
+        settingArray[existsIndex]=obj;
+        }
+
+        populateDropdown();
+
+        var jsonString = JSON.stringify(settingArray);
+
               // Get data service
               VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
               // Set value in user scope
               dataService.setValue("setting", jsonString).then(function(value) {
                   console.log("Setting set value is: " + value);
               });
-          });
+            });
     }
 
 
@@ -146,7 +203,10 @@ var sendemailextension = (function () {
         loadSettings:loadSettings,
         saveSettings:saveSettings,
         previewEmail:previewEmail,
-        sendEmail:sendEmail
+        sendEmail:sendEmail,
+        onChangeReleaseType:onChangeReleaseType,
+        createStaticId: createStaticId,
+        populateDropdown:populateDropdown
     }
 
 })();
