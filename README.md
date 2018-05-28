@@ -20,5 +20,5 @@ VSTS extension to send customized release email which adds completed workitems b
 
 # TODO
 - [ ] Validation
-- [ ] Generalize Release types and environments 
+- [X] Generalize Release types and environments 
 - [ ] Add CC support
