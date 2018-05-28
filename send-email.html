@@ -22,21 +22,26 @@
         }
     </style>
 </head>
-<body style="overflow-y: auto;">
+<body id="sendmailbody" style="overflow-y: auto;">
 <script type="text/javascript">
  	// Sets up the initial handshake with the host frame
      VSS.init({
 		// Our extension will explicitly notify the host when we're done loading
 		explicitNotifyLoaded: true,
-
+        setupModuleLoader: true,
 		// We are using some VSTS APIs, so we will need the module loader to load them in
 		usePlatformScripts: true,
 		usePlatformStyles: true       
 	});
-
-    VSS.notifyLoadSucceeded();
     
-    sendemailextension.loadSettings();
+    VSS.ready(function () {
+        var vsoContext = VSS.getWebContext();
+        sendemailextension.projectId = vsoContext.project.id;
+        sendemailextension.loadSettings();
+        VSS.notifyLoadSucceeded();
+    });
+
+    
 </script>
 
     <div class="custom-padding">
@@ -59,37 +64,26 @@
         <div class="tab-pane fade" id="email">
         <br/>
                     <div class="row">
-                            <div class="col-sm-4 btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-primary toggle-button">
-                                    <input type="radio" name="apptype" id="web" value="web"> Web
-                                    </label>
-                                    <label class="btn btn-primary toggle-button">
-                                    <input type="radio" name="apptype" id="mobile" value="mobile"> Mobile
-                                    </label>
+                            <div class="col-sm-5">    
+                                    <label for="releaseType">Select Release:</label>
+                                    <select class="form-control" id="sendmailreleaseType">
+                                      <option value="" disabled selected>--- Select ---</option>
+                                    </select>
                             </div>
                     </div>
+
                     <br>
-                    <div class="row">
-                    <div class="col-sm-4 btn-group btn-group-toggle" data-toggle="buttons">
-                            <label class="btn btn-primary toggle-button">
-                            <input type="radio" name="release" id="uat" value="uat"> Uat
-                            </label>
-                            <label class="btn btn-primary toggle-button">
-                            <input type="radio" name="release" id="prod" value="prod"> Prod
-                            </label>
-                    </div>
-                    </div>
                     <br>
 
                     <div class="row">            
-                        <div class="col-sm-4">    
+                        <div class="col-sm-5">    
                             <label for="subject">Subject</label>
                             <input type="text" class="form-control" id="subject" placeholder="email subject">
                         </div>
                     </div>
                     <br>
                     <div class="row"> 
-                            <div class="col-sm-2"></div>
+                            <div class="col-sm-3"></div>
                             <div class="col-sm-2"><button type="button" class="btn btn-secondary pull-right" onclick="sendemailextension.previewEmail()">Preview</button></div> 
                     </div>
 
@@ -134,8 +128,7 @@
                                 <label for="releaseType">Select Release:</label>
                                 <select class="form-control" id="releaseType" onchange="sendemailextension.onChangeReleaseType()">
                                   <option value="" disabled selected>--- Select ---</option>
-                                  <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create new release</u></option>
-                                  <option  value="test">Test</option>
+                                  <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create New Release</u></option>
                                 </select>
                         </div>
                 </div>
@@ -182,8 +175,11 @@
                 </div>
                 <br>
                 <div class="row">            
-                        <div class="col-sm-9">    
+                        <div class="col-sm-8">    
                         </div>
+                        <div class="col-sm-1">    
+                                <button id="btnDel" style="width: 100%;" type="button" class="btn btn-danger pull-right" onclick="sendemailextension.deleteSettings()" hidden>Delete</button>
+                        </div>   
                         <div class="col-sm-1">    
                                 <button id="btnSave" style="width: 100%;" type="button" class="btn btn-primary pull-right" onclick="sendemailextension.saveSettings()">Save</button>
                         </div>       

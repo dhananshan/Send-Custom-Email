@@ -3,6 +3,7 @@ var sendemailextension = (function () {
     // Used in releaseType dropdown as value for item 'create'. to avoid other dynamic values  
     // TODO: Need to change
     var createStaticId="create3b951d5a916e463d81e59f02f0ff09c3";
+    var projectId="";
 
     var settingArray=[];
 
@@ -12,6 +13,7 @@ var sendemailextension = (function () {
         $("#name").val('');
         $("#qid").val('');
         $("#body").val('');
+        $("#bodyContainer .richText-editor").empty();
     }
 
     onChangeReleaseType= function () {
@@ -21,12 +23,11 @@ var sendemailextension = (function () {
         $("#settingcontent").show();
 
         if($("#releaseType").val()==createStaticId){
-            $("#btnSave").text("Save");
+            $("#btnDel").hide();
         }else{
-            $("#btnSave").text("Update");
-         
+            $("#btnDel").show();
+
             var existingObj = settingArray.find(x=>x.Name==$("#releaseType").val());
-            console.log("Existing Object", existingObj );
             
             $("#to").val(existingObj.To);
             $("#backendurl").val(existingObj.BackendUrl);                
@@ -38,20 +39,63 @@ var sendemailextension = (function () {
 
     }
 
-    populateDropdown = function (){
-            
-        var dropdown=$("#releaseType");
+    deleteSettings =function () {
+        
+        var selelctedName =$("#releaseType").val();
+        let existsIndex= settingArray.findIndex(x=>x.Name==selelctedName);
+        if (existsIndex !== -1) {
+            settingArray.splice(existsIndex, 1);
+        }
 
-        dropdown.empty();
-        dropdown.append('<option value="" disabled selected>--- Select ---</option>');
-        dropdown.append(' <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create new release</u></option>');
+        var jsonString = JSON.stringify(settingArray);
+
+        // Get data service
+        VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
+        // Set value in user scope
+        dataService.setValue("setting"+sendemailextension.projectId , jsonString).then(function(value) {
+            clearSettings();
+            populateDropdown();
+
+            $("#btnSave").text("Save");
+            $("#btnSave").prop("disabled", false);
+            alert("Successfully Deleted!");
+
+        });
+      });
+
+
+
+    }
+
+
+    populateDropdown = function (){
+        
+        $("#btnDel").hide();
+        var dropdownReleaseType=$("#releaseType");
+        var dropdownSendmailreleaseType=$("#sendmailreleaseType");
+
+
+        dropdownReleaseType.empty();
+        dropdownSendmailreleaseType.empty();
+
+        dropdownReleaseType.append('<option value="" disabled selected>--- Select ---</option>');
+        dropdownSendmailreleaseType.append('<option value="" disabled selected>--- Select ---</option>');
+
+        dropdownReleaseType.append(' <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create New Release</u></option>');
 
             $.each(settingArray, function (index, item) {
-                dropdown.append(
+                dropdownReleaseType.append(
                     $('<option>', {
                         value: item.Name,
                         text: item.Name
-                    }, '</option>'))
+                    }, '</option>'));
+
+                    dropdownSendmailreleaseType.append(
+                        $('<option>', {
+                            value: item.Name,
+                            text: item.Name
+                        }, '</option>'));
+
                   }
                  );
     }
@@ -61,10 +105,11 @@ var sendemailextension = (function () {
         // Get data service
         VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
             // Get value in user scope
-                dataService.getValue("setting").then(function(value) {
-                    console.log("Setting retrieve value is: " + value);
-                    
+                dataService.getValue("setting"+sendemailextension.projectId).then(function(value) {
+                   
                     settingArray = JSON.parse(value);
+                    
+                    clearSettings();
                     populateDropdown();
 
                 });
@@ -72,6 +117,10 @@ var sendemailextension = (function () {
     }
 
     saveSettings = function () {
+        
+        $("#btnSave").text("Processing");
+        $("#btnSave").prop("disabled", true);
+
 
         var obj ={};
         obj.To=$("#to").val();
@@ -89,17 +138,23 @@ var sendemailextension = (function () {
         settingArray[existsIndex]=obj;
         }
 
-        populateDropdown();
 
         var jsonString = JSON.stringify(settingArray);
 
               // Get data service
               VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
               // Set value in user scope
-              dataService.setValue("setting", jsonString).then(function(value) {
-                  console.log("Setting set value is: " + value);
+              dataService.setValue("setting"+sendemailextension.projectId , jsonString).then(function(value) {
+                  clearSettings();
+                  populateDropdown();
+
+                  $("#btnSave").text("Save");
+                  $("#btnSave").prop("disabled", false);
+                  alert("Successfully Saved!");
+
               });
             });
+
     }
 
 
@@ -128,7 +183,7 @@ var sendemailextension = (function () {
 
              }
 
-            let emailcontent =$("#body").val(); 
+            let emailcontent =this.getBodyValue(); 
             emailcontent= emailcontent.replace("{workitem}", workitemhtml);
 
             $("#previewemail").val(emailcontent);
@@ -142,8 +197,10 @@ var sendemailextension = (function () {
     sendEmail=function(){
 
         $("#btnsendemail").prop("disabled",true);
+        var selelctedObj =getSelectedObjectValue();
+
         var emailObj={};
-        emailObj.To=$('#to').val();
+        emailObj.To= selelctedObj.To;
         emailObj.Subject=$('#subject').val();
         emailObj.Body=$('#previewemail').val();   
     
@@ -151,7 +208,7 @@ var sendemailextension = (function () {
     
         $.ajax({
     
-            url: $("#backendurl").val(),
+            url: selelctedObj.BackendUrl,
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -172,32 +229,22 @@ var sendemailextension = (function () {
     }
 
     getQueryId=function(){
-        var qid='';
-
-        if($('input[name=apptype]:checked').val()=='web'){
-
-            if($('input[name=release]:checked').val()=='uat'){
-                qid = $("#webuatqid").val();
-            }else if($('input[name=release]:checked').val()=='prod'){
-                qid = $("#webprodqid").val();
-            }
-            
-        }else if($('input[name=apptype]:checked').val()=='mobile'){
-
-            if($('input[name=release]:checked').val()=='uat'){
-                qid = $("#mobileuatqid").val();
-            }else if($('input[name=release]:checked').val()=='prod'){
-                qid = $("#mobileprodqid").val();
-            }
-
-        }
-        
-        console.info("Query Id",qid);
-
-        return qid;
+        var selectedReleaseType=$("#sendmailreleaseType").val();        
+        let selectedObj= settingArray.find(x=>x.Name==selectedReleaseType);       
+        return selectedObj.Qid;
     }
 
+    getBodyValue=function(){
+        var selectedReleaseType=$("#sendmailreleaseType").val();        
+        let selectedObj= settingArray.find(x=>x.Name==selectedReleaseType);       
+        return selectedObj.Body;
+    }
 
+    getSelectedObjectValue=function(){
+        var selectedReleaseType=$("#sendmailreleaseType").val();        
+        let selectedObj= settingArray.find(x=>x.Name==selectedReleaseType);       
+        return selectedObj;
+    }
 
     return {
         loadSettings:loadSettings,
@@ -206,7 +253,9 @@ var sendemailextension = (function () {
         sendEmail:sendEmail,
         onChangeReleaseType:onChangeReleaseType,
         createStaticId: createStaticId,
-        populateDropdown:populateDropdown
+        populateDropdown:populateDropdown,
+        projectId:projectId,
+        deleteSettings:deleteSettings
     }
 
 })();
