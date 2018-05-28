@@ -178,7 +178,7 @@ var sendemailextension = (function () {
              if(workitemsarray){
                                        
                     for(var i=0; i < workitemsarray.length ;i++ ){
-                        workitemhtml +=  workitemsarray[i].id + '<br>' 
+                        workitemhtml +=  '<a href="'+workitemsarray[i].url+'" target="_blank">'+workitemsarray[i].id+'</a> <br>' 
                     }
 
              }
