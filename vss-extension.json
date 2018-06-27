@@ -1,7 +1,7 @@
  {
         "manifestVersion": 1,
         "id": "send-custom-email",
-        "version": "2.0.2",
+        "version": "2.0.3",
         "name": "Send Custom Email",
         "description": "Send your own custom release email",
         "publisher": "NavinDhananshan",

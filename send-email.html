@@ -10,195 +10,187 @@
     <script src="node_modules\vss-web-extension-sdk\lib\VSS.SDK.js"></script>
     <script src="content/jquery.richtext.min.js"></script>
     <script src="content/main.js"></script>
-<style>
-        .custom-padding{
+    <style>
+        .custom-padding {
             padding-left: 2%;
             padding-right: 2%;
             padding-top: 1%;
         }
 
-        .toggle-button{
-            width:100px;
+        .toggle-button {
+            width: 100px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body id="sendmailbody" style="overflow-y: auto;">
-<script type="text/javascript">
- 	// Sets up the initial handshake with the host frame
-     VSS.init({
-		// Our extension will explicitly notify the host when we're done loading
-		explicitNotifyLoaded: true,
-        setupModuleLoader: true,
-		// We are using some VSTS APIs, so we will need the module loader to load them in
-		usePlatformScripts: true,
-		usePlatformStyles: true       
-	});
-    
-    VSS.ready(function () {
-        var vsoContext = VSS.getWebContext();
-        sendemailextension.projectId = vsoContext.project.id;
-        sendemailextension.loadSettings();
-        VSS.notifyLoadSucceeded();
-    });
+    <script type="text/javascript">
+        // Sets up the initial handshake with the host frame
+        VSS.init({
+            // Our extension will explicitly notify the host when we're done loading
+            explicitNotifyLoaded: true,
+            setupModuleLoader: true,
+            // We are using some VSTS APIs, so we will need the module loader to load them in
+            usePlatformScripts: true,
+            usePlatformStyles: true
+        });
 
-    
-</script>
+        VSS.ready(function () {
+            var vsoContext = VSS.getWebContext();
+            sendemailextension.projectId = vsoContext.project.id;
+            sendemailextension.loadSettings();
+            VSS.notifyLoadSucceeded();
+        });
 
+
+    </script>
     <div class="custom-padding">
-    <h4>Send release email</h4>
-    <br>
-
-    <ul class="nav nav-tabs">
+        <h4>Send release email</h4>
+        <br>
+        <ul class="nav nav-tabs">
             <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#email">Email</a>
+                <a class="nav-link" data-toggle="tab" href="#email">Email</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#setting">Setting</a>
+                <a class="nav-link" data-toggle="tab" href="#setting">Setting</a>
             </li>
-    </ul>
-
-
-
-    <div id="myTabContent" class="tab-content">
-
-        <div class="tab-pane fade" id="email">
-        <br/>
-                    <div class="row">
-                            <div class="col-sm-5">    
-                                    <label for="releaseType">Select Release:</label>
-                                    <select class="form-control" id="sendmailreleaseType">
-                                      <option value="" disabled selected>--- Select ---</option>
-                                    </select>
-                            </div>
-                    </div>
-
-                    <br>
-                    <br>
-
-                    <div class="row">            
-                        <div class="col-sm-5">    
-                            <label for="subject">Subject</label>
-                            <input type="text" class="form-control" id="subject" placeholder="email subject">
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row"> 
-                            <div class="col-sm-3"></div>
-                            <div class="col-sm-2"><button type="button" class="btn btn-secondary pull-right" onclick="sendemailextension.previewEmail()">Preview</button></div> 
-                    </div>
-
-
-
-
-
-
-                    <br>
-
-
-                    <h3>Preview email</h3>
-                    <br>
-            
-                    <div class="row">
-                        <div class="col-sm-8">
-                            <div id="previewemailContainer">  
-                                <textarea rows="4" class="container"  id="previewemail"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-sm-7"></div>
-                        <div class="col-sm-1">
-                            <button id="btnsendemail" type="button" class="btn btn-primary"   onclick="sendemailextension.sendEmail()">Send Email</button>
-                        </div>
-                    </div>
-                    <br>
-                    <br>  
-
-        </div>
-
-
-
-
-
-        <div class="tab-pane fade" id="setting">
-                <br/>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade" id="email">
+                <br />
                 <div class="row">
-                        <div class="col-sm-5">    
-                                <label for="releaseType">Select Release:</label>
-                                <select class="form-control" id="releaseType" onchange="sendemailextension.onChangeReleaseType()">
-                                  <option value="" disabled selected>--- Select ---</option>
-                                  <option  value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create New Release</u></option>
-                                </select>
-                        </div>
+                    <div class="col-sm-5">
+                        <label for="releaseType">Select Release:</label>
+                        <select class="form-control" id="sendmailreleaseType">
+                            <option value="" disabled selected>--- Select ---</option>
+                        </select>
+                    </div>
                 </div>
-
-                <div id="settingcontent" hidden>
-                <br/>
-                <div class="row">                    
-                        <div class="col-sm-5">    
-                                <label for="name">Name:</label>
-                                <input aria-describedby="nameHelp" type="text" class="form-control" id="name">
-                                <small id="nameHelp" class="form-text text-muted">Any unique name to identify this release (e.g. Mobile UAT, Web Production, Android UAT) </small>
-                        </div>
-
-                        <div class="col-sm-5">    
-                            <label for="to">To:</label>
-                            <input aria-describedby="toHelp" type="text" class="form-control" id="to">
-                            <small id="toHelp" class="form-text text-muted">Seperate by <b>;</b> for multiple email address</small>
-                        </div>
+                <br>
+                <br>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <label for="subject">Subject</label>
+                        <input type="text" class="form-control" id="subject" placeholder="email subject">
+                    </div>
                 </div>
                 <br>
                 <div class="row">
-                    <div class="col-sm-5">    
-                                <label for="to">Backend Email URL:</label>
-                                <input aria-describedby="tobackemailhelp" type="text" class="form-control" id="backendurl">
-                                <small id="tobackemailhelp" class="form-text text-muted"><a href="https://github.com/dhananshan/Send-Custom-Email#prerequisites" target="_blank">Help?</a> </small>
-                    </div>
-
-                    <div class="col-sm-5">    
-                        <label for="qid">Query Id:</label>
-                        <input aria-describedby="qidhelp" type="text" class="form-control" id="qid">
-                        <small id="qidhelp" class="form-text text-muted"><a href="https://stackoverflow.com/a/46274191/5417721" target="_blank">Help?</a> </small>
-                    </div>
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-secondary pull-right" onclick="sendemailextension.previewEmail()">Preview</button></div>
                 </div>
                 <br>
-                <div class="row">   
-                        <div class="col-sm-10">    
-                                <label for="body">Body Template:</label>
-                                <br>
-                                <div id="bodyContainer">  
-                                    <textarea aria-describedby="bodyHelp" rows="4" class="container" id="body"></textarea>
-                                    <small id="bodyHelp" class="form-text text-muted">Add {workitem} in your email body to replace with workitems of the query.</small>
-                                </div>
-                            </div>
-                </div>
+                <h3>Preview email</h3>
                 <br>
-                <div class="row">            
-                        <div class="col-sm-8">    
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div id="previewemailContainer">
+                            <textarea rows="4" class="container" id="previewemail"></textarea>
                         </div>
-                        <div class="col-sm-1">    
-                                <button id="btnDel" style="width: 100%;" type="button" class="btn btn-danger pull-right" onclick="sendemailextension.deleteSettings()" hidden>Delete</button>
-                        </div>   
-                        <div class="col-sm-1">    
-                                <button id="btnSave" style="width: 100%;" type="button" class="btn btn-primary pull-right" onclick="sendemailextension.saveSettings()">Save</button>
-                        </div>       
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-7"></div>
+                    <div class="col-sm-1">
+                        <button id="btnsendemail" type="button" class="btn btn-primary" onclick="sendemailextension.sendEmail()">Send Email</button>
+                    </div>
                 </div>
                 <br>
                 <br>
             </div>
+            <div class="tab-pane fade" id="setting">
+                <br />
+                <div class="row">
+                    <div class="col-sm-5">
+                        <label for="releaseType">Select Release:</label>
+                        <select class="form-control" id="releaseType" onchange="sendemailextension.onChangeReleaseType()">
+                            <option value="" disabled selected>--- Select ---</option>
+                            <option value="create3b951d5a916e463d81e59f02f0ff09c3"><u>Create New Release</u></option>
+                        </select>
+                    </div>
+                </div>
+                <div id="settingcontent" hidden>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <label for="name">Name:</label>
+                            <input aria-describedby="nameHelp" type="text" class="form-control" id="name">
+                            <small id="nameHelp" class="form-text text-muted">Any unique name to identify this release (e.g. Mobile UAT, Web Production, Android UAT) </small>
+                        </div>
+                        <div class="col-sm-5">
+                            <label for="to">To:</label>
+                            <input aria-describedby="toHelp" type="text" class="form-control" id="to">
+                            <small id="toHelp" class="form-text text-muted">Seperate by <b>;</b> for multiple email address</small>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <label for="to">Cc:</label>
+                            <input aria-describedby="ccHelp" type="text" class="form-control" id="cc">
+                            <small id="ccHelp" class="form-text text-muted">Seperate by <b>;</b> for multiple email address</small>
+                        </div>
+                    </div>
+                    <br>
 
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <label for="to">Backend Email URL:</label>
+                            <input aria-describedby="tobackemailhelp" type="text" class="form-control" id="backendurl">
+                            <small id="tobackemailhelp" class="form-text text-muted"><a href="https://github.com/dhananshan/Send-Custom-Email#prerequisites" target="_blank">Help?</a> </small>
+                        </div>
+                        <div class="col-sm-5">
+                            <label for="qid">Query Id:</label>
+                            <input aria-describedby="qidhelp" type="text" class="form-control" id="qid">
+                            <small id="qidhelp" class="form-text text-muted"><a href="https://stackoverflow.com/a/46274191/5417721" target="_blank">Help?</a> </small>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <label for="body">Body Template:</label>
+                            <br>
+                            <div id="bodyContainer">
+                                <textarea aria-describedby="bodyHelp" rows="4" class="container" id="body"></textarea>
+                                <small id="bodyHelp" class="form-text text-muted">Add {workitem} in your email body to replace with workitems of the query.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-8">
+                        </div>
+                        <div class="col-sm-1">
+                            <button id="btnDel" style="width: 100%;" type="button" class="btn btn-danger pull-right" onclick="sendemailextension.deleteSettings()" hidden>Delete</button>
+                        </div>
+                        <div class="col-sm-1">
+                            <button id="btnSave" style="width: 100%;" type="button" class="btn btn-primary pull-right" onclick="sendemailextension.saveSettings()">Save</button>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
         </div>
-
-
     </div>
-
-    </div>
-
-<script>
-    $('#previewemail').richText();
-    $('#body').richText();
-</script>
+    <script>
+        $('#previewemail').richText();
+        $('#body').richText();
+    </script>
 
 </body>
 </html>
