@@ -9,6 +9,7 @@ var sendemailextension = (function () {
 
     clearSettings = function () {
         $("#to").val('');
+		$("#cc").val('');
         $("#backendurl").val('');                
         $("#name").val('');
         $("#qid").val('');
@@ -30,6 +31,7 @@ var sendemailextension = (function () {
             var existingObj = settingArray.find(x=>x.Name==$("#releaseType").val());
             
             $("#to").val(existingObj.To);
+			$("#cc").val(existingObj.Cc);
             $("#backendurl").val(existingObj.BackendUrl);                
             $("#name").val(existingObj.Name);
             $("#qid").val(existingObj.Qid);
@@ -124,6 +126,7 @@ var sendemailextension = (function () {
 
         var obj ={};
         obj.To=$("#to").val();
+		obj.Cc = $("#cc").val();
         obj.BackendUrl=$("#backendurl").val();
         obj.Body=$("#body").val();
         obj.Name=$("#name").val();
@@ -166,6 +169,12 @@ var sendemailextension = (function () {
         VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
         function (VSS_Service, TFS_Wit_WebApi) {
 
+ 		var vstsdetails = VSS.getWebContext();
+        var url = vstsdetails.account.uri;
+        var projectname = vstsdetails.project.name;
+        var fullurl = url + projectname + "/_workitems/edit/";
+
+
         // Get a WIT client to make REST calls to VSTS
         var witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
 
@@ -173,21 +182,45 @@ var sendemailextension = (function () {
         witClient.queryById(this.getQueryId()).then(function(workItems) {
             
             var workitemsarray = workItems.workItems;
-            var workitemhtml='';
+            var workitemhtml = '';
+           // console.log(workItems.workItems);
+            var workItemIds = workItems.workItems.map(function (reference) { return reference.id; });
 
-             if(workitemsarray){
-                                       
-                    for(var i=0; i < workitemsarray.length ;i++ ){
-                        workitemhtml +=  '<a href="'+workitemsarray[i].url+'" target="_blank">'+workitemsarray[i].id+'</a> <br>' 
+            if (workItemIds.length > 0) {
+                
+                witClient.getWorkItems(workItemIds).then(function (_workItems) {
+                   // console.log(_workItems);
+                    var source = _workItems.map(function (w) {
+                        return [
+                            w.id,
+                            w.fields["System.Title"]
+                        ];
+                    });
+
+                    workitemhtml = ' <table rules="all" cellspacing="0" bordercolor="#4d4c4d" border="0" bgcolor="#FFFFFF" cellpadding="7" align="center" width="800" style="font-family:Verdana;">' +
+                        '<tr style="height:30px;font-size:13pt;text-align:center;background-color:lightblue;font-weight:bold;">' +
+                        '<td style="width:20%;">Bug Id</td>' +
+                        '<td style="width:80%">Description</td></tr>';
+
+                    for (var i = 0; i < source.length; i++) {
+                        workitemhtml += '<tr style="font-size:12pt;">';
+                        workitemhtml += '<td style="font-size:12pt;text-align:center;" >' + '<a href="' + fullurl + source[i][0] + '" target="_blank">' + source[i][0] + '</a ></td>';
+                        workitemhtml += '<td>' + '<a href="' + fullurl + source[i][0] + '" target="_blank">' + source[i][1] + '</a ></td></tr>'
+                        //workitemhtml += '<a href="' + fullurl+ source[i][0] + '" target="_blank">' + source[i][0] + '</a> ' + source[i][1]+ '<br>'
                     }
+                    workitemhtml += '</table>';
 
-             }
+                    VSS.notifyLoadSucceeded();
 
-            let emailcontent =this.getBodyValue(); 
-            emailcontent= emailcontent.replace("{workitem}", workitemhtml);
+                    let emailcontent = this.getBodyValue();
+                    emailcontent = emailcontent.replace("{workitem}", workitemhtml);
 
-            $("#previewemail").val(emailcontent);
-            $("#previewemailContainer .richText-editor").append(emailcontent);
+                    $("#previewemail").val(emailcontent);
+                    $("#previewemailContainer .richText-editor").append(emailcontent);
+
+                });
+            }
+           
            
             });    
         });
@@ -200,7 +233,7 @@ var sendemailextension = (function () {
         var selelctedObj =getSelectedObjectValue();
 
         var emailObj={};
-        emailObj.To= selelctedObj.To;
+        emailObj.To = selelctedObj.To + ";" + selelctedObj.Cc;
         emailObj.Subject=$('#subject').val();
         emailObj.Body=$('#previewemail').val();   
     
