@@ -10,15 +10,15 @@ VSTS extension to send customized release email which adds completed workitems b
 > {"To":"\<EMAIL ADDRESSES\>","Subject":"\<SUBJECT\>","Body":"\<EMAIL BODY\>"}
 # Demo 
 - Once you installed it will appear in **Build and Release**
-- Select UAT or Prod and Web or Mobile so it will trigger the query you have set in settings page (next image) and adds it in email once   you click preview 
-![Alt Title](images/demo-1.jpg?raw=true "Title")
+- Select a release type from dropdown (the release type is what you saved in settings page) and it will trigger the query you have set in settings page (next image) and adds it in email once you click preview 
+![Alt Title](images/demo-1.JPG?raw=true "Title")
 
 - Everything added here will be saved for future released. add multiple emails seperated by **;**
-![Alt Title](images/demo-2.jpg?raw=true "Demo 1")
+![Alt Title](images/demo-2.JPG?raw=true "Demo 1")
 
 
 
 # TODO
 - [ ] Validation
 - [X] Generalize Release types and environments 
-- [ ] Add CC support
+- [X] Add CC support
